@@ -53,7 +53,7 @@ describe "Game of Life" do
       @world.pods["x0y0"].food.should == 0
     end
     
-    it "Can be fed when fertilized" do
+    it "Will be fed when fertilized" do
       @pod.fertilize
       @pod.fertilize
       @pod.food.should == 2
@@ -95,7 +95,7 @@ describe "Game of Life" do
       @world.pods[position.to_s].should equal(@pod)
     end
     
-    it "Will die of malnutrition in the next cycle if it has fewer than two units of food" do
+    it "Will die of malnourishment in the next cycle if it has fewer than two units of food" do
       position = @pod.position
       1.times {@pod.fertilize}
       @pod.try_to_survive
@@ -152,7 +152,7 @@ describe "Game of Life" do
       @embryo.seeds.should == 5
     end
     
-    it "will be born in the next cycle if it has 3 seeds" do
+    it "Will be born in the next cycle if it has 3 seeds" do
       position = @embryo.position
       3.times {@embryo.fertilize}
       @embryo.try_birth
@@ -162,7 +162,7 @@ describe "Game of Life" do
       @world.pods[position.to_s].should_not == nil
     end
     
-    it "will die without being born in the next cycle if it has less than 3 seeds" do
+    it "Will die without being born in the next cycle if it has less than 3 seeds" do
       position = @embryo.position
       2.times {@embryo.fertilize}
       @embryo.try_birth
@@ -173,7 +173,7 @@ describe "Game of Life" do
       @embryo.world.should == nil
     end
     
-    it "will die without being born in the next cycle if it has more than 3 seeds" do
+    it "Will die without being born in the next cycle if it has more than 3 seeds" do
       position = @embryo.position
       4.times {@embryo.fertilize}
       @embryo.try_birth
@@ -214,7 +214,7 @@ describe "Game of Life" do
       @world.embryos["x10y20"].seeds.should == 2
     end
     
-    it "Will fed a pod if adding a seed at a position with an existing pod" do
+    it "Will feed a pod if adding a seed at a position with an existing pod" do
       new_position = Position.new(10,20)
       pod = Pod.new(new_position.x, new_position.y)
       @world.add_pod(pod)
@@ -268,7 +268,7 @@ describe "Game of Life" do
       settings[:dead_as].should == "0"
     end
     
-    it "Can report on an area of the infinite area as a string/grid" do
+    it "Can report on a subsection of the infinite area as a string/grid" do
       @world.add_pod(Pod.new(-2,-2))
       @world.add_pod(Pod.new(2,-2))
       @world.add_pod(Pod.new(0,0))
@@ -278,33 +278,7 @@ describe "Game of Life" do
       upper_left = Position.new(-2,-2)
       
       @world.display_settings = {
-        :origin => Position.new(-2,-2),
-        :width => 5,
-        :height => 5,
-        :live_as => "1",
-        :dead_as => "-"
-      }
-      
-      expected_display =  "1---1\n" +
-                          "-----\n" +
-                          "--1--\n" +
-                          "-----\n" +
-                          "1---1\n"
-      
-      @world.view_bounds_as_string.should == expected_display
-    end
-    
-    it "Can report on an area of the infinite area as a string/grid" do
-      @world.add_pod(Pod.new(-2,-2))
-      @world.add_pod(Pod.new(2,-2))
-      @world.add_pod(Pod.new(0,0))
-      @world.add_pod(Pod.new(-2,2))
-      @world.add_pod(Pod.new(2,2))
-      
-      upper_left = Position.new(-2,-2)
-      
-      @world.display_settings = {
-        :origin => Position.new(-2,-2),
+        :origin => upper_left,
         :width => 5,
         :height => 5,
         :live_as => "1",

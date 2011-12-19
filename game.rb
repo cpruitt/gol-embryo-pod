@@ -51,10 +51,6 @@ class World
     @embryos.delete(embryo.position.to_s)
   end
   
-  def fertilize
-    @seeds += 1
-  end
-  
   def add_seed_at(position)
     if @pods[position.to_s].nil?
       if @embryos[position.to_s].nil?
