@@ -1,6 +1,6 @@
-This is an implementation of [Conway's Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) that uses a metaphor of a living world where "Pods" and "Embryos" live and die in cycles. It is the test implementation of an idea that started during the [Global Day of Code Retreat](http://coderetreat.org/) 2011 (Tampa Bay).  The time to complete the initial working game was limited to an afternoon.
+This is an implementation of [Conway's Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) that uses a metaphor of a living world where "Pods" and "Embryos" live and die in cycles.  See "The Pod Story" below. It is a test/study implementation of an idea that started during the [Global Day of Code Retreat](http://coderetreat.org/) 2011 (Tampa Bay).
 
-This isn't a super polished final implementation, but maybe I'll make some improvements over time.
+I wanted to limit the time to complete the initial working game to an afternoon. This isn't a super polished final implementation, but maybe I'll make some improvements over time.
 
 ## Motivation
 
