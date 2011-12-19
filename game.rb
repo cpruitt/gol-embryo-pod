@@ -84,7 +84,6 @@ class World
       result += "\n"
     end
     result
-    
   end
   
 end
