@@ -31,12 +31,32 @@ describe "Game of Life" do
     it "Can be fed" do
       pod = Pod.new(1,1)
       pod.gets_fed
-      pod.food.should == 1
+      pod.gets_fed
+      pod.food.should == 2
     end
     
-    it "will be fed when fertilized" do
+    it "Can get hungry" do
+      pod = Pod.new(1,1)
+      pod.gets_fed
+      pod.gets_fed
+      pod.gets_hungry
+      pod.food.should == 0
+    end
+    
+    it "Will use all energy from it's food ant the end of a cycle and in it's end state will be hungry" do
+      @world.add_pod(Pod.new(0,-1))
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(0,1))
+      
+      @world.evolve
+      
+      @world.pods["x0y0"].food.should == 0
+    end
+    
+    it "Can be fed when fertilized" do
       @pod.fertilize
-      @pod.food.should == 1
+      @pod.fertilize
+      @pod.food.should == 2
     end
     
     it "Can throw seeds in all directions" do
@@ -47,14 +67,14 @@ describe "Game of Life" do
       pod.throw_seeds
       
       world.embryos.count.should == 8
-      world.embryos.keys.should include(Position.new(-1,-1).to_s)
-      world.embryos.keys.should include(Position.new(0,-1).to_s)
-      world.embryos.keys.should include(Position.new(1,-1).to_s)
-      world.embryos.keys.should include(Position.new(-1,0).to_s)
-      world.embryos.keys.should include(Position.new(1,0).to_s)
-      world.embryos.keys.should include(Position.new(-1,1).to_s)
-      world.embryos.keys.should include(Position.new(0,1).to_s)
-      world.embryos.keys.should include(Position.new(1,1).to_s)
+      world.embryos.keys.should include("x-1y-1")
+      world.embryos.keys.should include("x0y-1")
+      world.embryos.keys.should include("x1y-1")
+      world.embryos.keys.should include("x-1y0")
+      world.embryos.keys.should include("x1y0")
+      world.embryos.keys.should include("x-1y1")
+      world.embryos.keys.should include("x0y1")
+      world.embryos.keys.should include("x1y1")
     end
     
     it "Will continue to live in the next cycle if it has two units of food" do
@@ -248,6 +268,31 @@ describe "Game of Life" do
       settings[:dead_as].should == "0"
     end
     
+    it "Can report on an area of the infinite area as a string/grid" do
+      @world.add_pod(Pod.new(-2,-2))
+      @world.add_pod(Pod.new(2,-2))
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(-2,2))
+      @world.add_pod(Pod.new(2,2))
+      
+      upper_left = Position.new(-2,-2)
+      
+      @world.display_settings = {
+        :origin => Position.new(-2,-2),
+        :width => 5,
+        :height => 5,
+        :live_as => "1",
+        :dead_as => "-"
+      }
+      
+      expected_display =  "1---1\n" +
+                          "-----\n" +
+                          "--1--\n" +
+                          "-----\n" +
+                          "1---1\n"
+      
+      @world.view_bounds_as_string.should == expected_display
+    end
     
     it "Can report on an area of the infinite area as a string/grid" do
       @world.add_pod(Pod.new(-2,-2))

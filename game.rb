@@ -23,7 +23,7 @@ class World
     end
     
     @pods.each do |pod_key, pod|
-      pod.food = 0
+      pod.gets_hungry
     end
     
     @embryos.each do |embryo_key, embryo|
@@ -138,6 +138,10 @@ class Pod < Cell
   
   def gets_fed
     @food += 1
+  end
+  
+  def gets_hungry
+    @food = 0
   end
   
   def fertilize
