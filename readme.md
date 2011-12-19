@@ -1,4 +1,6 @@
-This is an implementation of [Conway's Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) that uses a metaphor of a living world where "Pods" and "Embryos" live and die in cycles.  See "The Pod Story" below. It is a test/study implementation of an idea that started during the [Global Day of Code Retreat](http://coderetreat.org/) 2011 (Tampa Bay).
+This is an implementation of [Conway's Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) that uses a metaphor of a living world where "Pods" and "Embryos" live and die in cycles.  See *"The Pod Story"* below.
+
+It is a test/study implementation of an idea that started during the [Global Day of Code Retreat](http://coderetreat.org/) 2011 (Tampa Bay).
 
 I wanted to limit the time to complete the initial working game to an afternoon. This isn't a super polished final implementation, but maybe I'll make some improvements over time.
 
@@ -7,7 +9,7 @@ I wanted to limit the time to complete the initial working game to an afternoon.
 This is probably **not** the most straightforward implementation of the game, but is a study that tries to address some questions / limitations:
 
 * How can the game be implemented in a way that is truly infinite?
-* The organisms should not need the world to tell them their environment.
+* The organisms should not need the world to tell them about their environment.
 * The implementation should use a very strong metaphor.
 * Arrays can not be used. (One of the code retreat challenges).
 * Bonus Challenge: Short Methods (8 lines or less)
@@ -15,7 +17,7 @@ This is probably **not** the most straightforward implementation of the game, bu
 
 See "Background" for more info on the above.
 
-## The Pod Story
+## "The Pod Story"
 
 Somewhere there is a World of infinite size. In that world live stationary life forms called Pods. Once per cycle all pods release seeds in all directions and all in unison.  If a seed falls on the ground, it becomes an embryo which hangs out for a while, waiting for other seeds to fall in the same location to fertilize it further.  Exactly three seeds combine to birth a new Pod.  If a seed falls on a Pod, the Pod eats it.  In fact, Pods have no other means of obtaining food beyond eating the seeds of other pods.* Pods are greedy little things and will keep eating seeds even if it kills them, which it eventually will.
 
