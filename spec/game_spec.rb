@@ -2,6 +2,228 @@ require File.dirname(__FILE__) + '/../game.rb'
 
 describe "Game of Life" do
   
+  describe "World" do
+    
+    before(:each) do
+      @world = World.new
+    end
+    
+    it "Can add a seed at a position creating a cell as an embryo if it does not exist" do
+      new_position = Position.new(10,20)
+      @world.add_seed_at(new_position)
+      @world.embryos.keys.should include("x10y20")
+      @world.embryos["x10y20"].world.should equal(@world)
+    end
+    
+    it "Can add a seed at a position without creating an embryo if a Pod already exists" do
+      new_position = Position.new(10,20)
+      pod = Pod.new(new_position.x, new_position.y)
+      @world.add_pod(pod)
+      @world.add_seed_at(new_position)
+      @world.embryos.keys.should_not include("x10y20")
+    end
+    
+    it "Will fertilize an embryo if adding a seed at a position with an existing embryo" do
+      new_position = Position.new(10,20)
+      @world.add_seed_at(new_position)
+      @world.add_seed_at(new_position)
+      @world.embryos.keys.should include("x10y20")
+      @world.embryos["x10y20"].seeds.should == 2
+    end
+    
+    it "Will feed a pod if adding a seed at a position with an existing pod" do
+      new_position = Position.new(10,20)
+      pod = Pod.new(new_position.x, new_position.y)
+      @world.add_pod(pod)
+      @world.add_seed_at(new_position)
+      @world.add_seed_at(new_position)
+      @world.pods["x10y20"].food.should == 2
+    end
+    
+    it "Can evolve over cycles with each living pod seeding the surrounding positions once per cycle" do
+      @world.add_pod(Pod.new(0,-1))
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(0,1))
+      
+      @world.evolve
+      
+      @world.pods.count.should == 3
+      @world.pods["x0y-1"].should == nil
+      @world.pods["x0y1"].should == nil
+      @world.pods["x0y0"].should_not == nil
+      @world.pods["x-1y0"].should_not == nil
+      @world.pods["x1y0"].should_not == nil
+    end
+    
+    it "Has display settings" do
+      settings = @world.display_settings
+      
+      settings[:origin].x.should == 0
+      settings[:origin].y.should == 0
+      settings[:width].should == 30
+      settings[:height].should == 30
+      settings[:live_as].should == "#"
+      settings[:dead_as].should == " "
+    end
+    
+    it "Can accept custom display settings" do
+      @world.display_settings = {
+        :origin => Position.new(10,10),
+        :width => 50,
+        :height => 50,
+        :live_as => "1",
+        :dead_as => "0"
+      }
+      
+      settings = @world.display_settings
+      
+      settings[:origin].x.should == 10
+      settings[:origin].y.should == 10
+      settings[:width].should == 50
+      settings[:height].should == 50
+      settings[:live_as].should == "1"
+      settings[:dead_as].should == "0"
+    end
+    
+    it "Can report on a subsection of the infinite area as a string/grid" do
+      @world.add_pod(Pod.new(-2,-2))
+      @world.add_pod(Pod.new(2,-2))
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(-2,2))
+      @world.add_pod(Pod.new(2,2))
+      
+      upper_left = Position.new(-2,-2)
+      
+      @world.display_settings = {
+        :origin => upper_left,
+        :width => 5,
+        :height => 5,
+        :live_as => "1",
+        :dead_as => "-"
+      }
+      
+      expected_display =  "1---1\n" +
+                          "-----\n" +
+                          "--1--\n" +
+                          "-----\n" +
+                          "1---1\n"
+      
+      @world.view_bounds_as_string.should == expected_display
+    end
+    
+    it "Can update it's display after each evolution cycle" do
+      @world.add_pod(Pod.new(0,-1))
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(0,1))
+      
+      @world.display_settings = {
+        :origin => Position.new(-2,-2),
+        :width => 5,
+        :height => 5,
+        :live_as => "1",
+        :dead_as => "-"
+      }
+      
+      iteration_0 = @world.view_bounds_as_string
+      iteration_0_expected =  "-----\n" +
+                              "--1--\n" +
+                              "--1--\n" +
+                              "--1--\n" +
+                              "-----\n"
+      
+      @world.evolve
+      iteration_1 = @world.view_bounds_as_string
+      iteration_1_expected =  "-----\n" +
+                              "-----\n" +
+                              "-111-\n" +
+                              "-----\n" +
+                              "-----\n"
+      
+      @world.evolve
+      iteration_2 = @world.view_bounds_as_string
+      iteration_2_expected =  "-----\n" +
+                              "--1--\n" +
+                              "--1--\n" +
+                              "--1--\n" +
+                              "-----\n"
+      
+      @world.evolve
+      iteration_3 = @world.view_bounds_as_string
+      iteration_3_expected =  "-----\n" +
+                              "-----\n" +
+                              "-111-\n" +
+                              "-----\n" +
+                              "-----\n"
+      
+      iteration_0.should == iteration_0_expected
+      iteration_1.should == iteration_1_expected
+      iteration_2.should == iteration_2_expected
+      iteration_3.should == iteration_3_expected
+      
+    end
+    
+    it "Can report on statistics for game state as cycles progress" do
+      # test_origin = Position.new(0,0)
+      # 
+      # @world.display_settings = {
+      #   :origin => test_origin,
+      #   :width => 150,
+      #   :height => 50,
+      #   :live_as => "1",
+      #   :dead_as => "-"
+      # }
+      
+      @world.add_pod(Pod.new(0,0))
+      @world.add_pod(Pod.new(1,0))
+      @world.add_pod(Pod.new(0,1))
+      @world.add_pod(Pod.new(1,1))
+      
+      @world.add_pod(Pod.new(2,2))
+      @world.add_pod(Pod.new(3,2))
+      @world.add_pod(Pod.new(2,3))
+      @world.add_pod(Pod.new(3,3))
+      
+      living_count_0 = @world.statistics[:pods_alive] # 8
+      born_count_0 = @world.statistics[:pods_born] # 0
+      died_count_0 = @world.statistics[:pods_died] # 0
+
+      @world.evolve
+      living_count_1 = @world.statistics[:pods_alive] # 6
+      born_count_1 = @world.statistics[:pods_born] # 0
+      died_count_1 = @world.statistics[:pods_died] # 2
+      
+      @world.evolve
+      living_count_2 = @world.statistics[:pods_alive] # 8
+      born_count_2 = @world.statistics[:pods_born] # 2
+      died_count_2 = @world.statistics[:pods_died] # 0
+      
+      @world.evolve
+      living_count_3 = @world.statistics[:pods_alive] # 6
+      born_count_3 = @world.statistics[:pods_born] # 0
+      died_count_3 = @world.statistics[:pods_died] # 2
+      
+      cycle_count = @world.statistics[:cycle_count] = 4
+      
+      cycle_count.should == 4
+      
+      living_count_0.should == 8
+      living_count_1.should == 6
+      living_count_2.should == 8
+      living_count_3.should == 6
+      
+      born_count_0.should == 0
+      born_count_1.should == 0
+      died_count_2.should == 0
+      born_count_3.should == 0
+      
+      died_count_0.should == 0
+      died_count_1.should == 2
+      born_count_2.should == 2
+      died_count_3.should == 2
+    end
+    
+  end
+  
   describe "Pod" do
     
     before :each do
@@ -181,169 +403,6 @@ describe "Game of Life" do
       @world.embryos.count.should == 0
       @world.pods.count.should == 0
       @world.pods[position.to_s].should == nil
-    end
-    
-  end
-  
-  describe "World" do
-    
-    before(:each) do
-      @world = World.new
-    end
-    
-    it "Can add a seed at a position creating a cell as an embryo if it does not exist" do
-      new_position = Position.new(10,20)
-      @world.add_seed_at(new_position)
-      @world.embryos.keys.should include("x10y20")
-      @world.embryos["x10y20"].world.should equal(@world)
-    end
-    
-    it "Can add a seed at a position without creating an embryo if a Pod already exists" do
-      new_position = Position.new(10,20)
-      pod = Pod.new(new_position.x, new_position.y)
-      @world.add_pod(pod)
-      @world.add_seed_at(new_position)
-      @world.embryos.keys.should_not include("x10y20")
-    end
-    
-    it "Will fertilize an embryo if adding a seed at a position with an existing embryo" do
-      new_position = Position.new(10,20)
-      @world.add_seed_at(new_position)
-      @world.add_seed_at(new_position)
-      @world.embryos.keys.should include("x10y20")
-      @world.embryos["x10y20"].seeds.should == 2
-    end
-    
-    it "Will feed a pod if adding a seed at a position with an existing pod" do
-      new_position = Position.new(10,20)
-      pod = Pod.new(new_position.x, new_position.y)
-      @world.add_pod(pod)
-      @world.add_seed_at(new_position)
-      @world.add_seed_at(new_position)
-      @world.pods["x10y20"].food.should == 2
-    end
-    
-    it "Can evolve over cycles with each living pod seeding the surrounding positions once per cycle" do
-      @world.add_pod(Pod.new(0,-1))
-      @world.add_pod(Pod.new(0,0))
-      @world.add_pod(Pod.new(0,1))
-      
-      @world.evolve
-      
-      @world.pods.count.should == 3
-      @world.pods["x0y-1"].should == nil
-      @world.pods["x0y1"].should == nil
-      @world.pods["x0y0"].should_not == nil
-      @world.pods["x-1y0"].should_not == nil
-      @world.pods["x1y0"].should_not == nil
-    end
-    
-    it "Has display settings" do
-      settings = @world.display_settings
-      
-      settings[:origin].x.should == 0
-      settings[:origin].y.should == 0
-      settings[:width].should == 30
-      settings[:height].should == 30
-      settings[:live_as].should == "#"
-      settings[:dead_as].should == " "
-    end
-    
-    it "Can accept custom display settings" do
-      @world.display_settings = {
-        :origin => Position.new(10,10),
-        :width => 50,
-        :height => 50,
-        :live_as => "1",
-        :dead_as => "0"
-      }
-      
-      settings = @world.display_settings
-      
-      settings[:origin].x.should == 10
-      settings[:origin].y.should == 10
-      settings[:width].should == 50
-      settings[:height].should == 50
-      settings[:live_as].should == "1"
-      settings[:dead_as].should == "0"
-    end
-    
-    it "Can report on a subsection of the infinite area as a string/grid" do
-      @world.add_pod(Pod.new(-2,-2))
-      @world.add_pod(Pod.new(2,-2))
-      @world.add_pod(Pod.new(0,0))
-      @world.add_pod(Pod.new(-2,2))
-      @world.add_pod(Pod.new(2,2))
-      
-      upper_left = Position.new(-2,-2)
-      
-      @world.display_settings = {
-        :origin => upper_left,
-        :width => 5,
-        :height => 5,
-        :live_as => "1",
-        :dead_as => "-"
-      }
-      
-      expected_display =  "1---1\n" +
-                          "-----\n" +
-                          "--1--\n" +
-                          "-----\n" +
-                          "1---1\n"
-      
-      @world.view_bounds_as_string.should == expected_display
-    end
-    
-    it "Can update it's display after each evolution cycle" do
-      @world.add_pod(Pod.new(0,-1))
-      @world.add_pod(Pod.new(0,0))
-      @world.add_pod(Pod.new(0,1))
-      
-      @world.display_settings = {
-        :origin => Position.new(-2,-2),
-        :width => 5,
-        :height => 5,
-        :live_as => "1",
-        :dead_as => "-"
-      }
-      
-      iteration_0 = @world.view_bounds_as_string
-      iteration_0_expected =  "-----\n" +
-                              "--1--\n" +
-                              "--1--\n" +
-                              "--1--\n" +
-                              "-----\n"
-      
-      @world.evolve
-      iteration_1 = @world.view_bounds_as_string
-      iteration_1_expected =  "-----\n" +
-                              "-----\n" +
-                              "-111-\n" +
-                              "-----\n" +
-                              "-----\n"
-      
-      @world.evolve
-      iteration_2 = @world.view_bounds_as_string
-      iteration_2_expected =  "-----\n" +
-                              "--1--\n" +
-                              "--1--\n" +
-                              "--1--\n" +
-                              "-----\n"
-      
-      @world.evolve
-      iteration_3 = @world.view_bounds_as_string
-      iteration_3_expected =  "-----\n" +
-                              "-----\n" +
-                              "-111-\n" +
-                              "-----\n" +
-                              "-----\n"
-      
-      iteration_0.should == iteration_0_expected
-      iteration_1.should == iteration_1_expected
-      iteration_2.should == iteration_2_expected
-      iteration_3.should == iteration_3_expected
-      
-      
     end
     
   end

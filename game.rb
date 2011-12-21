@@ -11,24 +11,40 @@ class World
       :live_as => "#",
       :dead_as => " "
     }
+    
+    @cycle_count = 0
+    @died_last_cycle = 0
+    @born_last_cycle = 0
+    
+    @statistics = {
+      :pods_alive => 0,
+      :pods_born => 0,
+      :pods_died => 0,
+      :cycle_count => 0
+    }
+  end
+  
+  def update_statistics
+  end
+  
+  def statistics
+    @statistics = {
+      :pods_alive => @pods.count,
+      :pods_born => @born_last_cycle,
+      :pods_died => @died_last_cycle,
+      :cycle_count => @cycle_count
+    }
+    @statistics
   end
   
   def evolve
-    @pods.each do |pod_key, pod|
-      pod.throw_seeds
-    end
-    
-    @pods.each do |pod_key, pod|
-      pod.try_to_survive
-    end
-    
-    @pods.each do |pod_key, pod|
-      pod.gets_hungry
-    end
-    
-    @embryos.each do |embryo_key, embryo|
-      embryo.try_birth
-    end
+    @pods.each { |pod_key, pod| pod.throw_seeds }
+    @pods.each { |pod_key, pod| pod.try_to_survive }
+    @pods.each { |pod_key, pod| pod.gets_hungry }
+    @embryos.each { |embryo_key, embryo| embryo.try_birth }
+    @cycle_count += 1
+    @died_last_cycle = @pods.count < @statistics[:pods_alive] ? @statistics[:pods_alive] - @pods.count : 0
+    @born_last_cycle = @pods.count > @statistics[:pods_alive] ? @pods.count - @statistics[:pods_alive] : 0
   end
   
   def add_pod(pod)
