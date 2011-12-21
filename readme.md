@@ -4,7 +4,7 @@ This is an implementation of [Conway's Game of Life](http://en.wikipedia.org/wik
 
 It is a test/study implementation of an idea that started during the [Global Day of Code Retreat](http://coderetreat.org/) 2011 (Tampa Bay).
 
-I wanted to limit the time to complete the initial working game to an afternoon. This isn't a super polished final implementation, but maybe I'll make some improvements over time.
+I wanted to limit the time to complete the initial working game to an afternoon (initial commit). The curses interface was added later.
 
 ## Motivation
 
