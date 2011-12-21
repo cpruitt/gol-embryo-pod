@@ -132,6 +132,61 @@ describe "Game of Life" do
       
     end
     
+    it "Can maintain pause / resume state" do
+      @game.pause
+      paused_state = @game.paused?
+      @game.resume
+      resume_state = @game.paused?
+    end
+    
+    it "Can pause the life cycles of pods" do
+      game = GameOfLife.new({
+        :window_rows => 8,
+        :window_columns => 7,
+        :world_settings => {
+          :live_as => "#",
+          :dead_as => "-",
+          :origin => Position.new(0,0)
+        }
+      })
+      
+      game.new_pods_at([ [2,2],[2,1],[2,3] ])
+      
+      play_log = []
+      loop_counter = 0
+      
+      game.play 5, do |game|
+        game.pause if loop_counter == 2
+        game.resume if loop_counter == 4
+        play_log << game.world.view_bounds_as_string
+        loop_counter += 1
+      end
+      
+      even_iteration =  "-------\n" +
+                        "--#----\n" +
+                        "--#----\n" +
+                        "--#----\n" +
+                        "-------\n"
+    
+      odd_iteration =   "-------\n" +
+                        "-------\n" +
+                        "-###---\n" +
+                        "-------\n" +
+                        "-------\n"
+      
+      
+      play_log.count.should == 8
+      
+      play_log[0].should == even_iteration
+      play_log[1].should == odd_iteration
+      play_log[2].should == even_iteration # paused
+      play_log[3].should == even_iteration # paused
+      play_log[4].should == even_iteration
+      play_log[5].should == odd_iteration
+      play_log[6].should == even_iteration
+      play_log[7].should == odd_iteration
+    end
+    
   end
   
   describe "World" do

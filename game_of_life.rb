@@ -48,9 +48,13 @@ class GoLPods
     ensure
       Curses.close_screen
     end
+    
+    puts closing_message
   end
   
   def play_game
+    
+    
     @game.play do |game|
       keypress = Curses.getch
       unless false #keypress == ""
@@ -59,9 +63,16 @@ class GoLPods
         when Curses::Key::DOWN then game.world.display_settings[:origin].move.north_by(3)
         when Curses::Key::RIGHT then game.world.display_settings[:origin].move.east_by(3)
         when Curses::Key::LEFT then game.world.display_settings[:origin].move.west_by(3)
-        when ?q then break
+        when ?q
+          break
+        when " "
+          if @game.paused?
+            @game.resume
+          else
+            @game.pause
+          end
         else
-          #other options...
+          # do nothing...
         end
       end
       
@@ -71,6 +82,20 @@ class GoLPods
       Curses.addstr game_content.gsub("\n", "")
       Curses.refresh
     end
+    
+    
+  end
+  
+  def closing_message
+    <<-eos
+      
+      
+      GAME OF LIFE - EMBRYOS & PODS
+      Thank you for playing.
+      www.github.com/cpruitt/gol-embryo-pod
+      
+      
+    eos
   end
   
   def self.play

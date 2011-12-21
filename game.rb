@@ -12,12 +12,24 @@ class GameOfLife
       :cycle_length => 0.1
     }.merge(options)
     
+    @paused = false
+    @cycles_played = 0
+    
     @world = World.new
     @world.display_settings = @settings[:world_settings]
     recalculate_world_display_settings
-    
-    @cycles_played = 0
-    
+  end
+  
+  def resume
+    @paused = false
+  end
+  
+  def pause
+    @paused = true
+  end
+  
+  def paused?
+    @paused
   end
   
   def recalculate_world_display_settings
@@ -37,15 +49,15 @@ class GameOfLife
     
     yield(self) if block_given?
     
+    # No test for the nil condition.  Not sure how to test "run forever"
     while count.nil? || @cycles_played < count do
-      @world.evolve
+      @world.evolve unless paused?
       
-      # There has GOT to be a better way to do this
+      # There has GOT to be a better way to do this next line
       yield(self) if block_given?
       
-      # No test for the nil condition.  Not sure how to test "run forever"
-      @cycles_played += 1 unless count.nil?
-      
+      @cycles_played += 1 unless paused?
+        
       sleep(@settings[:cycle_length])
     end
   end
@@ -104,7 +116,7 @@ class World
       :width => 30,
       :height => 30,
       :live_as => "#",
-      :dead_as => "."
+      :dead_as => " "
     }
     
     @cycle_count = 0
