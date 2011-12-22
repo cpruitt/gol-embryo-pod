@@ -15,7 +15,8 @@ This is probably **not** the most straightforward implementation of the game, bu
 * The implementation should use a very strong metaphor.
 * Arrays can not be used. (One of the code retreat challenges).
 * Bonus Challenge: Short Methods (8 lines or less)
-    * *Close, but not quite there. I think my longest are 11 lines long.*
+    * *<del>Close, but not quite there. I think my longest are 11 lines long.</del>*
+    * *After the initial commit, not so much*
 
 See "Background" for more info on the above.
 
@@ -65,3 +66,5 @@ To create the output for display I iterate over a given number for width and hei
 ### Bonus Challenge: Use Short Methods of 8 Lines or Less
 
 This was another Code Retreat restriction in one of the sessions. I actually wasn't trying to implement it this time around, but I found that in the process of trying to keep things clean all of my methods were super short anyway.  I went back to shorten some up.  I think I have two methods left that are 11 lines long.
+
+*This pretty much went out the window after the initial commit. Oh well, maybe after refactoring...*
