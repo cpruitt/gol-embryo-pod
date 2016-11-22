@@ -1,10 +1,30 @@
 require 'bundler/setup'
 require 'curses'
 require './game'
+require './world'
+require './cell'
+require './embryo'
+require './pod'
+require './position'
+require './pod_seeder'
 
 class GoLPods
   def initialize
     begin
+      puts "Choose a seeder to start:"
+      seeders = PodSeeder.seeders.keys.sort
+      puts "0: Quit / Cancel"
+      seeders.each_with_index do |seeder, idx|
+        desc = PodSeeder.desc(seeder)
+        puts "#{idx + 1}: #{desc}"
+      end
+
+      selected_seeder = gets.to_i - 1
+      if selected_seeder == -1
+        puts "Bye."
+        return
+      end
+
       Curses.noecho
       Curses.init_screen
       Curses.curs_set 0
@@ -17,33 +37,8 @@ class GoLPods
         :window_columns => Curses.cols
       })
 
-      @game.new_pods_at([
-        [5,5],
-        [5,6],
-        [5,4],
-
-        [10,10],
-        [10,11],
-        [10,12],
-        [9,12],
-        [8,11],
-
-        [20,10],
-        [20,11],
-        [20,12],
-        [19,12],
-        [18,11]
-      ])
-
-      (0..100).each do |y|
-        @game.new_pod_at(0,y)
-      end
-
-      (50..75).each do |y|
-        (50..75).each do |x|
-          @game.new_pod_at(x,y)
-        end
-      end
+      # PodSeeder.dev_seed(@game)
+      PodSeeder.send(seeders[selected_seeder], @game)
 
       play_game
     ensure
